@@ -1,7 +1,5 @@
 package com.resort;
 
-import java.util.ArrayList;
-import java.util.List;
 
 public class FamilyMember {
     private static int counter = 1;

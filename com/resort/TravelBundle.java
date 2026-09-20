@@ -42,6 +42,18 @@ public class TravelBundle {
         return liftPasses;
     }
 
+    public boolean hasLiftPassFor(String personName) {
+        return liftPasses.stream()
+                .anyMatch(pass -> pass.getHolderNames().contains(personName));
+    }
+    
+    public LiftPass getLiftPassFor(String personName) {
+        return liftPasses.stream()
+            .filter(pass -> pass.getHolderNames().contains(personName))
+            .findFirst()
+                .orElse(null);
+    }
+
     public void addLiftPass(LiftPass liftPass) {
         liftPasses.add(liftPass);
     }
@@ -92,16 +104,15 @@ public class TravelBundle {
                         output.append(" - ").append(member.getName()).append("\n");
                     }
                 }
-                output.append("Lift Passes: ").append("\n");
+                output.append("Lift Passes Holders: ").append("\n");
                 if (liftPasses.isEmpty()) {
                     output.append(" None\n");
                 } else {
                     for (LiftPass pass : liftPasses) {
-                        output.append(" - ").append(pass.getHolderName())
-                                .append(": Type ").append(pass.getType())
-                                .append(", Days ").append(pass.getDays())
-                                .append(" - $").
-                                append(String.format("%.2f", pass.getPrice())).append("\n");
+                        output.append(" - ").append(pass.getHolderNames())
+                                .append(", Type:").append(pass.getType())
+                                .append(", Days: ").append(pass.getDays())
+                                .append(", Price: $").append(String.format("%.2f\n", pass.getPrice()));
                     }
                 }
                 output.append("Accommodation: ").append(accommodationInfo);

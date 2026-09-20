@@ -1,7 +1,5 @@
 package com.resort;
 
-import java.util.List;
-
 public class Customer {
     private final int id;
     private final String name;

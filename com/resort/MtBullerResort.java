@@ -241,18 +241,32 @@ public class MtBullerResort {
 
     public void addLiftPass() throws RecordNotFoundException {
         TravelBundle bundle = selectBundle();
-        String holder = selectPersonInBundle(bundle);
+        List<String> holders = selectPeopleInBundle(bundle);
+        if (holders.isEmpty()) {
+            return;
+        }
 
         System.out.println("Choose lift pass type: 1-Single lift(s) at $" + LiftPass.SINGLE_LIFT_RATE + "/day, "
                         + "2-Season unlimited pass (" + LiftPass.SEASON_DAYS +
                         " days) at $" + LiftPass.SEASON_UNLIMITED_PRICE + " flat");
         int choice = InputHelper.readInt(scanner, "Enter your choice", 1, 2);
 
+        LiftPassType type;
+        int days;
         if (choice == 1) {
-            int days = InputHelper.readInt(scanner, "Enter the number of days for the single lift pass for " + holder, 1, 30);
-            bundle.addLiftPass(new LiftPass(holder, LiftPassType.DAY, days));
+            days = InputHelper.readInt(
+                    scanner,
+                    "Enter the number of days for each selected person",
+                    1,
+                    30);
+            type = LiftPassType.DAY;
         } else {
-            bundle.addLiftPass(new LiftPass(holder, LiftPassType.SEASON, LiftPass.SEASON_DAYS));
+            days = LiftPass.SEASON_DAYS;
+            type = LiftPassType.SEASON;
+        }
+
+        for (String holder : holders) {
+            bundle.addLiftPass(new LiftPass(List.of(holder), type, days));
         }
         System.out.println("Lift pass added. Bundle lift pass total is now $" + String.format("%.2f", bundle.liftPassTotal()));
     }
@@ -296,6 +310,60 @@ public class MtBullerResort {
                 .orElseThrow(() -> new RecordNotFoundException("No bundle found with ID " + bundleId + "."));
     }
 
+    private List<String> selectPeopleInBundle(TravelBundle bundle) {
+        List<String> people = new ArrayList<>();
+        people.add(bundle.getCustomer().getName());
+        
+        for (FamilyMember member : bundle.getFamilyMembers()) {
+            people.add(member.getName());
+        }
+
+        System.out.println("People in this bundle:");
+        List<String> availablePeople = new ArrayList<>();
+        for (int i = 0; i < people.size(); i++) {
+            String name = people.get(i);
+            if (bundle.hasLiftPassFor(name)) {
+                System.out.printf("- %s (already has a lift pass)%n", name);
+            } else {
+                availablePeople.add(name);
+            }
+        }
+
+        if (availablePeople.isEmpty()) {
+            System.out.println("Everyone in this bundle already has a lift pass.");
+            return List.of();
+        }
+
+        System.out.println("People available for a lift pass:");
+        for (int i = 0; i < availablePeople.size(); i++) {
+            System.out.printf("%d - %s%n", i + 1, availablePeople.get(i));
+        }
+
+        int numberOfPeople = InputHelper.readInt(
+                scanner,
+                "How many people should receive a lift pass",
+                1,
+                availablePeople.size());
+
+        List<String> selectedPeople = new ArrayList<>();
+
+        while (selectedPeople.size() < numberOfPeople) {
+            int choice = InputHelper.readInt(
+                    scanner,
+                    "Select person " + (selectedPeople.size() + 1),
+                    1,
+                    availablePeople.size());
+            String selectedPerson = availablePeople.get(choice - 1);
+
+            if (selectedPeople.contains(selectedPerson)) {
+                System.out.printf("%s has already been selected.%n", selectedPerson);
+            } else {
+                selectedPeople.add(selectedPerson);
+            }
+        }
+        return selectedPeople;
+    }
+    /*
     private String selectPersonInBundle(TravelBundle bundle) {
         System.out.println("People in this bundle: \n1-" + bundle.getCustomer().getName() + " (customer)");
         List<FamilyMember> familyMembers = bundle.getFamilyMembers();
@@ -308,4 +376,5 @@ public class MtBullerResort {
         }
         return familyMembers.get(choice - 2).getName();
     }
+    */
 }
