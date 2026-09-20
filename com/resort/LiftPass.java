@@ -4,7 +4,9 @@ public class LiftPass implements Priceable {
 
     public static final double SINGLE_LIFT_RATE = 26.0; // Rate for a single lift pass
     public static final double SEASON_UNLIMITED_PRICE = 200.0; // Flat
-    public static final int SEASON_UNLIMITED_DAYS = 30; 
+    public static final int SEASON_DAYS = 30;
+    public static final int DAY_DISCOUNT_THRESHOLD = 5;
+    public static final double DAY_DISCOUNT_RATE = 0.9;
 
     private static int counter = 1;
     private int id;
@@ -19,9 +21,33 @@ public class LiftPass implements Priceable {
         this.days = days;
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public String getHolderName() {
+        return holderName;
+    }
+
+    public LiftPassType getType() {
+        return type;
+    }
+
+    public int getDays() {
+        return days;
+    }
+
+    public double getBasePrice() {
+        return type == LiftPassType.SEASON ? SEASON_UNLIMITED_PRICE : SINGLE_LIFT_RATE * days;
+    }
+
+    public boolean hasDiscount() {
+        return type == LiftPassType.DAY && days > DAY_DISCOUNT_THRESHOLD;
+    }
+
     @Override 
     public double getPrice() {
-        return (type == LiftPassType.DAY) ? days * SINGLE_LIFT_RATE : SEASON_UNLIMITED_PRICE;
+        return hasDiscount() ? getBasePrice() * DAY_DISCOUNT_RATE : getBasePrice();
     }
 
     @Override

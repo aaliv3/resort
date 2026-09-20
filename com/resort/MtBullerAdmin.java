@@ -8,8 +8,9 @@ public class MtBullerAdmin {
         MtBullerResort resort = new MtBullerResort(scanner);
         resort.loadInitialData();
 
-        System.out.println("Welcome to Mt Buller Resort Bundle System");
         System.out.println("==========================================");
+        System.out.println("Welcome to Mt Buller Resort Bundle System");
+        
 
         boolean running = true;
         while (running) {

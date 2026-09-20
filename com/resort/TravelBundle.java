@@ -77,19 +77,45 @@ public class TravelBundle {
         return 1 + familyMembers.size();
     }
 
-    @Override 
+    @Override
     public String toString() {
-        String accomodationInfo = (accommodation != null) ? accommodation.describe() : "No accommodation booked";
-        return "TravelBundle ID: " + id + "\n" +
-               "Customer: " + customer.getName() + "\n" +
-               "Family Members: " + familyMembers.size() + "\n" +
-               "Lift Passes: " + liftPasses.size() + "\n" +
-               "Accommodation: " + accomodationInfo + "\n" +
-               "Start Date: " + startDate + "\n" +
-               "Duration: " + duration + " days\n" +
-               "End Date: " + getEndDate() + "\n" +
-               "Total Lift Pass Cost: $" + String.format("%.2f", liftPassTotal()) + "\n" +
-               "-------------------- \n";
+        String accommodationInfo = accommodation != null ? accommodation.describe() : "No accommodation booked";
+        StringBuilder output = new StringBuilder();
+        output.append("TravelBundle ID: ").append(id).append("\n")
+                .append("Customer: ").append(customer.getName()).append("\n")
+                .append("Family Members: ").append(familyMembers.size());
+                if (familyMembers.isEmpty()) {
+                    output.append(" None\n");
+                } else {
+                    output.append(System.lineSeparator());
+                    for (FamilyMember member : familyMembers) {
+                        output.append(" - ").append(member.getName()).append("\n");
+                    }
+                }
+                output.append("Lift Passes: ").append("\n");
+                if (liftPasses.isEmpty()) {
+                    output.append(" None\n");
+                } else {
+                    for (LiftPass pass : liftPasses) {
+                        output.append(" - ").append(pass.getHolderName())
+                                .append(": Type ").append(pass.getType())
+                                .append(", Days ").append(pass.getDays())
+                                .append(" - $").
+                                append(String.format("%.2f", pass.getPrice())).append("\n");
+                    }
+                }
+                output.append("Accommodation: ").append(accommodationInfo);
+                if (accommodation != null) {
+                    output.append(" - $").append(String.format("%.2f", accommodation.getPrice())).append("/night\n");
+                } else {
+                    output.append("\n");
+                }
+                output.append("Start Date: ").append(startDate).append("\n")
+                .append("Duration: ").append(duration).append(" days\n")
+                .append("End Date: ").append(getEndDate()).append("\n")
+                .append("Total Lift Pass Cost: $").append(String.format("%.2f", liftPassTotal())).append("\n")
+                .append("Bundle Total Cost: $").append(String.format("%.2f", (liftPassTotal() + (accommodation != null ? accommodation.getPrice() * duration : 0)))).append("\n")
+                .append("-------------------- \n");
+         return output.toString();
     }
-
 }

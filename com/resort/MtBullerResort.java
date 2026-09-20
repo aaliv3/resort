@@ -222,10 +222,11 @@ public class MtBullerResort {
     }
 
 
-    //  List bundles (with Customer and Family details)
+    //  List bundles 
 
     public void listBundles() {
         if (bundles.isEmpty()) {
+            System.out.println("--- All Travel Bundles ---");
             System.out.println("There are no bundles in the system.");
             return;
         }
@@ -242,16 +243,16 @@ public class MtBullerResort {
         TravelBundle bundle = selectBundle();
         String holder = selectPersonInBundle(bundle);
 
-        System.out.println("Choose lift pass type: 1-Single lift(s) at $" + LiftPass.SINGLE_LIFT_RATE + "/lift, "
-                        + "2-Season unlimited pass (" + LiftPass.SEASON_UNLIMITED_DAYS +
+        System.out.println("Choose lift pass type: 1-Single lift(s) at $" + LiftPass.SINGLE_LIFT_RATE + "/day, "
+                        + "2-Season unlimited pass (" + LiftPass.SEASON_DAYS +
                         " days) at $" + LiftPass.SEASON_UNLIMITED_PRICE + " flat");
         int choice = InputHelper.readInt(scanner, "Enter your choice", 1, 2);
 
         if (choice == 1) {
-            int lifts = InputHelper.readInt(scanner, "Enter the number of single lifts to buy for " + holder, 1, 30);
-            bundle.addLiftPass(new LiftPass(holder, LiftPassType.DAY, lifts));
+            int days = InputHelper.readInt(scanner, "Enter the number of days for the single lift pass for " + holder, 1, 30);
+            bundle.addLiftPass(new LiftPass(holder, LiftPassType.DAY, days));
         } else {
-            bundle.addLiftPass(new LiftPass(holder, LiftPassType.SEASON, LiftPass.SEASON_UNLIMITED_DAYS));
+            bundle.addLiftPass(new LiftPass(holder, LiftPassType.SEASON, LiftPass.SEASON_DAYS));
         }
         System.out.println("Lift pass added. Bundle lift pass total is now $" + String.format("%.2f", bundle.liftPassTotal()));
     }
@@ -274,10 +275,8 @@ public class MtBullerResort {
     }
 
     /**
-     * True if this customer already has a bundle whose [start, end] date range
-     * overlaps the given range. Uses the same "overlap" definition as
-     * Reservation.overlaps() for consistency with the accommodation-
-     * availability checks elsewhere in the system.
+     * True if customer already has a bundle whose [start, end] date range
+     * overlaps the given range.
      */
     private boolean hasOverlappingBundle(Customer customer, LocalDate startDate, LocalDate endDate) {
         return bundles.stream()
@@ -298,7 +297,7 @@ public class MtBullerResort {
     }
 
     private String selectPersonInBundle(TravelBundle bundle) {
-        System.out.println("People in this bundle: 1-" + bundle.getCustomer().getName() + " (customer)");
+        System.out.println("People in this bundle: \n1-" + bundle.getCustomer().getName() + " (customer)");
         List<FamilyMember> familyMembers = bundle.getFamilyMembers();
         for (int i = 0; i < familyMembers.size(); i++) {
             System.out.println((i + 2) + "-" + familyMembers.get(i).getName() + " (family member)");
